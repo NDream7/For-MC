@@ -35,8 +35,9 @@ function tukarGambar(img, nama) {
 }
 
 /* muat gambar senang lebih awal supaya langsung muncul saat diganti */
-[namaUtamaSenang, ...namaSenang].forEach((nama) => cariGambar(nama, () => {}));
-
+window.addEventListener("load", () => {
+  [namaUtamaSenang, ...namaSenang].forEach((nama) => cariGambar(nama, () => {}));
+});
 /* ---- stiker kecil yang tersebar ----
    x, y = posisi dalam persen layar, s = ukuran (vw), r = putar (derajat) */
 const posisi = [
@@ -56,6 +57,8 @@ const posisi = [
 const stikerLatar = [];
 posisi.forEach((p, i) => {
   const img = document.createElement("img");
+  img.decoding = "async";
+  img.onload = () => img.classList.add("siap");
   img.src = fileSedih[i % fileSedih.length];
   img.alt = "";
   img.style.left = p.x + "%";

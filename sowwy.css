@@ -133,3 +133,11 @@ body.senang #teks {
   padding: 6px 18px;
   color: #333;
 }
+
+#latar img {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+#latar img.siap {
+  opacity: 1;
+}
