@@ -101,9 +101,9 @@ function kabur() {
   if (level >= 5) {
     iya.classList.add("penuh");
   } else {
-    iya.style.fontSize = 1 + level * 0.6 + "rem";
-    iya.style.padding = `${12 + level * 10}px ${24 + level * 16}px`;
-  }
+  const skala = Math.min(1, innerWidth / 800);
+  iya.style.fontSize = 1 + level * 0.6 * skala + "rem";
+  iya.style.padding = `${12 + level * 10 * skala}px ${24 + level * 16 * skala}px`;  }
 }
 
 kolomNgga.addEventListener("mouseenter", kabur); /* mouse / laptop */

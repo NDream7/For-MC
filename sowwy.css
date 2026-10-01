@@ -141,3 +141,25 @@ body.senang #teks {
 #latar img.siap {
   opacity: 1;
 }
+
+/* ===== Batas lebar tombol Iya ===== */
+#iya { max-width: 92vw; }
+#iya.penuh { max-width: none; }
+
+/* ===== Tablet ===== */
+@media (max-width: 1024px) {
+  #latar img { max-width: 130px; }
+  .stiker-utama { width: clamp(100px, 20vw, 160px); }
+}
+
+/* ===== Hape ===== */
+@media (max-width: 600px) {
+  body { min-height: 100svh; }
+  #latar img { max-width: 64px; }
+  .stiker-utama { width: 95px; }
+  h1 { font-size: 1.4rem; }
+  p { font-size: 0.95rem; }
+  button { padding: 10px 18px; font-size: 0.95rem; }
+  .kolom-ngga small { font-size: 0.7rem; }
+  #iya.penuh { font-size: clamp(2rem, 10vw, 4rem); }
+}
