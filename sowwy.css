@@ -134,3 +134,30 @@ textarea {
   .isi, .surat { font-size: 0.95rem; padding: 12px 14px; }
   button { padding: 10px 18px; font-size: 0.95rem; }
 }
+
+/* ===== Lebar kotak otomatis mengikuti layar ===== */
+#kartu {
+  width: min(100%, 560px);
+  transition: width 0.4s ease;
+}
+
+/* laptop dan layar besar */
+@media (min-width: 900px) {
+  #kartu { width: min(100%, 680px); }
+  .isi, .surat { font-size: 1.08rem; }
+}
+
+/* surat lebih lebar supaya teksnya lega */
+#kartu[data-layar="surat"] {
+  width: min(100%, 760px);
+}
+
+/* tablet */
+@media (min-width: 601px) and (max-width: 1024px) {
+  #kartu[data-layar] { width: min(92%, 640px); }
+}
+
+/* hape: penuh selebar layar */
+@media (max-width: 600px) {
+  #kartu[data-layar] { width: 100%; }
+}
