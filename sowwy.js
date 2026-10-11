@@ -1,23 +1,26 @@
-const iya = document.getElementById("iya");
-const ngga = document.getElementById("ngga");
+/* ====== PENGATURAN SPREADSHEET ======
+   Tempel URL Web App dari Google Apps Script di sini (berakhiran /exec) */
+const URL_SPREADSHEET = "https://script.google.com/macros/s/AKfycbyDyx_Zk25pY3EGfKEda1OVqQ4felA4cZuDoL6vp3blIBlByfp-5doXC-93RoqaoOI/exec";
+
+const kartu = document.getElementById("kartu");
 const latar = document.getElementById("latar");
 const stikerUtama = document.getElementById("stikerUtama");
-const judul = document.getElementById("judul");
-const teks = document.getElementById("teks");
-const tombol = document.getElementById("tombol");
+const isian = document.getElementById("isian");
+const petunjuk = document.getElementById("petunjuk");
+const btnKirim = document.getElementById("kirim");
 
 /* ---- daftar gambar ----
    Sedih  : stiker/sedih-1.png ... stiker/sedih-11.png
    Senang : stiker/seneng-1 ... stiker/seneng-11 (+ seneng-utama)
-   Untuk gambar senang, ekstensi (.png / .jpg / .jpeg / .webp) dicari otomatis,
-   jadi file boleh campur png dan jpg. Cukup nama depannya yang harus sama. */
+   Bunga  : stiker/bunga (untuk surat)
+   Ekstensi gambar senang dan bunga (.png/.jpg/.jpeg/.webp) dicari otomatis. */
 const jumlah = 11;
 const fileSedih = Array.from({ length: jumlah }, (_, i) => `stiker/sedih-${i + 1}.png`);
 const namaSenang = Array.from({ length: jumlah }, (_, i) => `stiker/seneng-${i + 1}`);
 const namaUtamaSenang = "stiker/seneng-utama";
+const namaBunga = "stiker/bunga";
 const ekstensi = [".png", ".jpg", ".jpeg", ".webp"];
 
-/* coba satu per satu ekstensi sampai gambarnya ketemu */
 function cariGambar(nama, selesai, n = 0) {
   if (n >= ekstensi.length) {
     console.warn("Gambar tidak ditemukan:", nama);
@@ -28,16 +31,15 @@ function cariGambar(nama, selesai, n = 0) {
   tes.onerror = () => cariGambar(nama, selesai, n + 1);
   tes.src = nama + ekstensi[n];
 }
-
-/* ganti gambar hanya kalau file barunya ketemu */
 function tukarGambar(img, nama) {
   cariGambar(nama, (src) => { img.src = src; });
 }
 
-/* muat gambar senang lebih awal supaya langsung muncul saat diganti */
+/* muat gambar senang dan bunga di belakang layar setelah halaman selesai */
 window.addEventListener("load", () => {
-  [namaUtamaSenang, ...namaSenang].forEach((nama) => cariGambar(nama, () => {}));
+  [namaUtamaSenang, namaBunga, ...namaSenang].forEach((nama) => cariGambar(nama, () => {}));
 });
+
 /* ---- stiker kecil yang tersebar ----
    x, y = posisi dalam persen layar, s = ukuran (vw), r = putar (derajat) */
 const posisi = [
@@ -69,68 +71,69 @@ posisi.forEach((p, i) => {
   stikerLatar.push(img);
 });
 
-/* ---- tombol Ngga: kabur saat didekati, Iya makin besar ---- */
-const kolomNgga = document.querySelector(".kolom-ngga"); /* tombol + teks kecilnya */
-const teksNgga = ["Ngga", "Yakin?", "Beneran?", "Aku sedih nih", "Pweeaassee..."];
-let level = 0;
-let tx = 0, ty = 0; /* geseran Ngga dari posisi aslinya */
+/* ---- pindah antar layar ---- */
+function tampilkan(id) {
+  document.querySelectorAll(".layar").forEach((l) => {
+    l.classList.toggle("aktif", l.id === id);
+  });
+  kartu.dataset.layar = id;
+  window.scrollTo({ top: 0, behavior: "smooth" });
 
-function kabur() {
-  /* 1) pindah ke tempat acak yang cukup jauh dari posisi sekarang */
-  const r = kolomNgga.getBoundingClientRect();
-  const asalX = r.left - tx;
-  const asalY = r.top - ty;
-  const batas = 12;
-  const maxX = Math.max(batas, innerWidth - r.width - batas);
-  const maxY = Math.max(batas, innerHeight - r.height - batas);
-
-  let x, y;
-  for (let i = 0; i < 10; i++) {
-    x = batas + Math.random() * (maxX - batas);
-    y = batas + Math.random() * (maxY - batas);
-    if (Math.hypot(x - r.left, y - r.top) > 160) break;
+  if (id === "surat") {
+    const bunga = document.getElementById("stikerBunga");
+    cariGambar(namaBunga, (src) => { bunga.src = src; bunga.hidden = false; });
   }
-  tx = x - asalX;
-  ty = y - asalY;
-  kolomNgga.style.transform = `translate(${tx}px, ${ty}px)`;
-
-  /* 2) teks Ngga berubah dan tombol Iya makin besar */
-  level++;
-  ngga.textContent = teksNgga[Math.min(level, teksNgga.length - 1)];
-
-  if (level >= 5) {
-    iya.classList.add("penuh");
-  } else {
-  const skala = Math.min(1, innerWidth / 800);
-  iya.style.fontSize = 1 + level * 0.6 * skala + "rem";
-  iya.style.padding = `${12 + level * 10 * skala}px ${24 + level * 16 * skala}px`;  }
 }
 
-kolomNgga.addEventListener("mouseenter", kabur); /* mouse / laptop */
-kolomNgga.addEventListener(
-  "touchstart",
-  (e) => {
-    e.preventDefault(); /* cegah terpencet di hape */
-    kabur();
-  },
-  { passive: false }
-);
-ngga.addEventListener("click", kabur); /* jaga-jaga kalau dipencet lewat keyboard */
+/* semua tombol ber-atribut data-ke berpindah ke layar itu */
+let tingkat = "";
+document.querySelectorAll("[data-ke]").forEach((tbl) => {
+  tbl.addEventListener("click", () => {
+    const tujuan = tbl.dataset.ke;
 
-/* ---- tombol Iya: semua stiker jadi senang ---- */
-iya.addEventListener("click", () => {
-  iya.classList.remove("penuh");
-  tombol.style.display = "none";
+    if (tbl.dataset.tingkat) {            /* pilihan tingkat marah */
+      tingkat = tbl.dataset.tingkat;
+      document.querySelectorAll("[data-versi]").forEach((v) => {
+        v.hidden = v.dataset.versi !== tingkat;
+      });
+    }
+    if (tujuan === "maaf") jadiSenang();  /* sudah dimaafin */
+    tampilkan(tujuan);
+  });
+});
 
-  judul.textContent = "YIIPPIIEE MAACIIHH! 🥹⭐";
-  teks.textContent = "janji ndakaann diulangin agiiiii.";
+/* ---- semua stiker jadi senang ---- */
+function jadiSenang() {
   document.body.classList.add("senang");
-
   tukarGambar(stikerUtama, namaUtamaSenang);
   stikerUtama.classList.add("senang");
-
   stikerLatar.forEach((img, i) => {
     tukarGambar(img, namaSenang[i % namaSenang.length]);
     img.classList.add("senang");
   });
+}
+
+/* ---- kirim jawaban ke spreadsheet ---- */
+function simpan(data) {
+  if (!URL_SPREADSHEET.startsWith("https://")) {
+    console.warn("URL spreadsheet belum diisi di sowwy.js");
+    return;
+  }
+  fetch(URL_SPREADSHEET, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(data),
+  }).catch(() => {});
+}
+
+btnKirim.addEventListener("click", () => {
+  const jawaban = isian.value.trim();
+  if (!jawaban) {
+    petunjuk.textContent = "isi dulu yaa 🥺";
+    return;
+  }
+  btnKirim.disabled = true;
+  simpan({ tingkat, jawaban });
+  tampilkan("siap");
 });

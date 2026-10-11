@@ -1,6 +1,7 @@
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100svh;
   display: grid;
   place-items: center;
   background: #ffe4ec;
@@ -12,154 +13,124 @@ body {
 body.senang { background: #fff7d6; }
 
 /* stiker latar */
-#latar {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
+#latar { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 #latar img {
   position: absolute;
   height: auto;
   transform: rotate(var(--rot));
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
+#latar img.siap { opacity: 1; }
 
 /* isi utama */
 #kartu {
   position: relative;
   z-index: 1;
+  width: min(560px, 100%);
   padding: 16px;
-  max-width: 100%;
   box-sizing: border-box;
 }
-.stiker-utama {
-  width: clamp(110px, 22vw, 200px);
-  height: auto;
+.stiker-utama { width: clamp(100px, 20vw, 170px); height: auto; }
+#kartu[data-layar="surat"] .stiker-utama { display: none; }
+
+h1 {
+  display: inline-block;
+  max-width: 100%;
+  margin: 10px 0;
+  padding: 6px 18px;
+  font-size: clamp(1.3rem, 5vw, 2rem);
+  color: #c2185b;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
-h1 { font-size: clamp(1.5rem, 5vw, 2.2rem); }
+
+/* satu layar tampil sekali */
+.layar { display: none; }
+.layar.aktif { display: block; animation: muncul 0.5s ease; }
+@keyframes muncul {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* kotak paragraf */
+.isi {
+  margin: 10px 0 14px;
+  padding: 12px 18px;
+  text-align: left;
+  line-height: 1.55;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+.isi p { margin: 0.6em 0; }
+.isi .penutup { font-weight: 600; color: #c2185b; }
 
 /* tombol */
-.tombol {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.kolom-ngga {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  position: relative;
-  z-index: 2;
-  transition: transform 0.25s ease;
-}
-.kolom-ngga small {
-  position: relative;
-  display: inline-block;
-  max-width: 70vw;
-  margin-top: 8px;
-  padding: 5px 12px;
-  font-size: 0.75rem;
-  color: #c2185b;
-  background: #fff;
-  border: 2px solid #ff9ebb;
-  border-radius: 12px;
-}
-/* segitiga kecil yang menunjuk ke tombol Ngga */
-.kolom-ngga small::before {
-  content: "";
-  position: absolute;
-  top: -7px;
-  left: 50%;
-  width: 10px;
-  height: 10px;
-  background: #fff;
-  border-left: 2px solid #ff9ebb;
-  border-top: 2px solid #ff9ebb;
-  transform: translateX(-50%) rotate(45deg);
-}
+.pilihan { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 button {
+  max-width: 92vw;
+  margin: 4px;
   padding: 12px 24px;
   font-size: 1rem;
   border: none;
   border-radius: 999px;
+  background: #ddd;
   cursor: pointer;
   transition: all 0.3s ease;
 }
-#iya { background: #ff5c8a; color: white; }
-#ngga { background: #ddd; }
+button:hover { transform: scale(1.04); }
+button.utama { background: #ff5c8a; color: #fff; }
+button:disabled { opacity: 0.6; cursor: default; }
 
-/* tombol Iya memenuhi layar */
-#iya.penuh {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
+/* kolom isian */
+textarea {
   width: 100%;
-  height: 100%;
-  border-radius: 0;
-  font-size: clamp(2.5rem, 12vw, 7rem);
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font: inherit;
+  border: 2px solid #ff9ebb;
+  border-radius: 12px;
+  resize: vertical;
 }
+.petunjuk { min-height: 1.2em; font-size: 0.85rem; color: #c2185b; }
+
+/* surat */
+.surat {
+  padding: 20px 22px;
+  text-align: left;
+  line-height: 1.65;
+  font-family: Georgia, "Times New Roman", serif;
+  background: #fffdf5;
+  border: 1px solid #e8dcc0;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  transform: rotate(-0.6deg);
+}
+.surat .dari { text-align: right; font-style: italic; }
+#stikerBunga { display: block; margin: 10px auto 0; width: clamp(110px, 30vw, 170px); height: auto; }
 
 /* stiker senang: loncat-loncat kecil */
-#latar img.senang,
-.stiker-utama.senang {
+#latar img.senang, .stiker-utama.senang {
   animation: loncat 0.6s ease-in-out infinite alternate;
 }
-#latar img.senang:nth-child(even) {
-  animation-delay: 0.3s;
-}
+#latar img.senang:nth-child(even) { animation-delay: 0.3s; }
 @keyframes loncat {
   from { translate: 0 0; }
   to   { translate: 0 -12px; }
 }
 
-/* label teks setelah dimaafin supaya kontras */
-body.senang #judul,
-body.senang #teks {
-  width: fit-content;
-  max-width: 90vw;
-  margin: 10px auto;
-  background: rgba(255, 255, 255, 0.92);
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-}
-body.senang #judul {
-  padding: 8px 22px;
-  color: #c2185b;
-}
-body.senang #teks {
-  padding: 6px 18px;
-  color: #333;
-}
-
-#latar img {
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-#latar img.siap {
-  opacity: 1;
-}
-
-/* ===== Batas lebar tombol Iya ===== */
-#iya { max-width: 92vw; }
-#iya.penuh { max-width: none; }
-
 /* ===== Tablet ===== */
 @media (max-width: 1024px) {
   #latar img { max-width: 130px; }
-  .stiker-utama { width: clamp(100px, 20vw, 160px); }
 }
 
 /* ===== Hape ===== */
 @media (max-width: 600px) {
-  body { min-height: 100svh; }
   #latar img { max-width: 64px; }
   .stiker-utama { width: 95px; }
-  h1 { font-size: 1.4rem; }
-  p { font-size: 0.95rem; }
+  h1 { font-size: 1.3rem; }
+  .isi, .surat { font-size: 0.95rem; padding: 12px 14px; }
   button { padding: 10px 18px; font-size: 0.95rem; }
-  .kolom-ngga small { font-size: 0.7rem; }
-  #iya.penuh { font-size: clamp(2rem, 10vw, 4rem); }
 }
